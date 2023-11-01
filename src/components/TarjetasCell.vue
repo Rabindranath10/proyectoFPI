@@ -2,22 +2,18 @@
   <div class="row contenedores">
     {{ anuncios }}
     <!--tarjeta 1-->
-    <div class="col-6 col-md-3" v-for="(dato, i) in anuncios" :key="i">
+    <div class="col-6 col-md-3" v-for="(dato, i) in datos" :key="i">
       <q-card class="my-card-small q-mx-xs" flat bordered>
         <q-img :src="dato.imagen" />
 
         <q-card-section>
-          <center>
-            <div class="text-overline text-green-9">
-              {{ dato.marcaTelefono }}
-            </div>
-          </center>
-          <center>
-            <div class="text-h6 q-mt-xs q-mb-xs">{{ dato.precio }}</div>
-          </center>
-          <center>
-            <div class="text-caption text-grey">{{ dato.descripcion }}</div>
-          </center>
+          <div class="text-overline text-green-9">
+            {{ dato.marcaTelefono }}
+          </div>
+
+          <div class="text-h6 q-mt-xs q-mb-xs">{{ dato.precio }}</div>
+
+          <div class="text-caption text-grey">{{ dato.descripcion }}</div>
         </q-card-section>
 
         <q-card-actions>

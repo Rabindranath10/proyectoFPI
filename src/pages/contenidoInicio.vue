@@ -1,4 +1,102 @@
-<script>
+<script setup>
+import EssentialLink from "components/EssentialLink.vue";
+import TarjetasCell from "src/components/TarjetasCell.vue";
+import { defineComponent, ref, computed, onMounted, onBeforeMount } from "vue";
+import { collection, addDoc, getDocs, query } from "firebase/firestore";
+import { db } from "boot/firebase";
+import { useCollection } from "vuefire";
+import { useQuasar } from "quasar";
+
+const group = ref([]);
+const valorInicial = 0.0;
+const valorFinal = 0.0;
+const nuevo = ref(false);
+const $q = useQuasar();
+const optionsUno = ref([
+  { label: "Samsung 15", value: "sam" },
+  { label: "Huawei 10", value: "hua" },
+  { label: "Nokia 56", value: "noki" },
+  { label: "iPhone 4", value: "phone" },
+  { label: "Xiomi 4", value: "xioami" },
+]);
+const optionsDos = [
+  { label: "Android 15", value: "an" },
+  { label: "Windows 10", value: "win" },
+  { label: "Ios 56", value: "ios" },
+];
+const optionsTres = [
+  { label: "6.0", value: "seis" },
+  { label: "5.5", value: "cincoPunto" },
+  { label: "5", value: "cinco" },
+];
+
+const anuncios = useCollection(collection(db, "anuncios"));
+const anunciosFiltrados = ref([]);
+const drawer = ref(true);
+const drawerSegundo = ref(false);
+const current = ref(3);
+const icon = ref(false);
+const paginacion = [4, 8, 12, 25];
+const seleccionarPagina = ref(12);
+const dialog = ref(false);
+const maximizedToggle = ref(true);
+const optionsEleccion = ["Android", "Windows", "Ios"];
+const opcion = "usado";
+const marca = "";
+const modelo = "";
+const uploadedFiles = [];
+const customFileList = [];
+const selectedLabel = "Precio";
+const esDispositivoMovil = computed(() => {
+  // Utiliza Quasar's $q.screen para detectar si es un dispositivo móvil
+  return $q.screen.width <= 600; // Puedes ajustar este valor según tus necesidades
+});
+
+onMounted(async () => {
+  console.log("onMounted");
+  setTimeout(() => {
+    anunciosFiltrados.value = [...anuncios.value];
+    setMarcaFilters();
+  }, 1000);
+});
+
+const setMarcaFilters = async () => {
+  const anunciosC = await obtenerAnuncios();
+  const marcas = anunciosC.map((anuncio) => anuncio.marcaTelefono);
+  const marcasUnicas = [...new Set(marcas)];
+  optionsUno.value = marcasUnicas.map((marca) => {
+    return { label: marca, value: marca };
+  });
+};
+
+const onItemClick = (option) => {
+  selectedLabel = option;
+};
+
+const obtenerAnuncios = async () => {
+  return [...anuncios.value];
+};
+
+const filtrarPorMarca = async () => {
+  // console.log(obtenerAnuncios());
+  const filtros = group.value;
+
+  console.log(filtros.length);
+
+  if (filtros.length == 0) {
+    anunciosFiltrados.value = await obtenerAnuncios();
+    return;
+  }
+
+  const anunciosC = await obtenerAnuncios();
+
+  anunciosFiltrados.value = anunciosC.filter((anuncio) => {
+    return filtros.includes(anuncio.marcaTelefono);
+  });
+};
+</script>
+
+<!-- <script>
 import EssentialLink from "components/EssentialLink.vue";
 import TarjetasCell from "src/components/TarjetasCell.vue";
 
@@ -34,12 +132,6 @@ export default {
   setup() {
     const anuncios = ref(null);
 
-    onMounted(async () => {
-      anuncios.value = await useCollection(collection(db, "anuncios")).value;
-      console.log(anuncios.value);
-      console.log(anuncios.value.length);
-      console.log("Hola mundo");
-    });
     return {
       drawer: ref(true),
       group,
@@ -82,8 +174,8 @@ export default {
     };
   },
   components: { TarjetasCell },
-};
-</script>
+}; -->
+<!-- </script> -->
 <template>
   <div class="row">
     <div class="col-2">
@@ -97,10 +189,12 @@ export default {
           "
         >
           <legend>Marca:</legend>
+          {{ group }}
           <q-option-group
             :options="optionsUno"
             type="checkbox"
             v-model="group"
+            @update:modelValue="filtrarPorMarca"
           />
         </fieldset>
 
@@ -198,14 +292,14 @@ export default {
       <div class="col-12 col-md">
         <br />
         <!--aqui-->
-        <tarjetas-cell :anuncios="anuncios"></tarjetas-cell>
+        <tarjetas-cell :anuncios="anunciosFiltrados"></tarjetas-cell>
 
         <!--codigo de los numeros de abajo-->
         <div class="q-pa-lg flex flex-center">
           <div class="q-pa-lg flex flex-center">
             <q-pagination v-model="current" :max="8" direction-links />
           </div>
-          <center class="gt-sm">Articulos por pagina:</center>
+          Articulos por pagina:
           <q-select
             transition-show="scale"
             transition-hide="scale"

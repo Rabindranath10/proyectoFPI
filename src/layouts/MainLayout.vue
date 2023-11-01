@@ -1,3 +1,81 @@
+<script setup>
+import { defineComponent, ref, computed, onMounted } from "vue";
+import EssentialLink from "components/EssentialLink.vue";
+import TarjetasCell from "src/components/TarjetasCell.vue";
+import { useRouter } from "vue-router";
+import { collection, addDoc, getDocs, query } from "firebase/firestore";
+import { db } from "boot/firebase";
+import { useCollection } from "vuefire";
+import { useQuasar } from "quasar";
+
+const $q = useQuasar();
+const router = useRouter();
+
+const group = ref([]);
+const estadoRef = ref(null);
+const marcaRef = ref(null);
+const modeloRef = ref(null);
+const pantallaRef = ref(null);
+const sistemaRef = ref(null);
+const romRef = ref(null);
+const ramRef = ref(null);
+const imagenesURL = ref(null);
+const tituloRef = ref(null);
+const vendedorRef = ref(null);
+const telefonoRef = ref(null);
+const descripcionRef = ref(null);
+const precioRef = ref(null);
+const dialog = ref(false);
+const maximizedToggle = ref(true);
+const slide = ref(1);
+const drawer = ref(false);
+const selectedOption = ref(null);
+const options = ref(["Android", "Windows", "Ios"]);
+const opcionesSistema = ref(["Android", "Windows", "Ios"]);
+const uploadedFiles = ref([]);
+const customFileList = [];
+
+const nuevoAnuncio = ref({
+  marcaTelefono: "",
+  modelo: "",
+  pantalla: 0.0,
+  sistema: "",
+  rom: 0.0,
+  ram: 0.0,
+  imagenesURL: "",
+  titulo: "",
+  vendedor: "",
+  telefono: 0.0,
+  descripcion: "",
+  precio: 0.0,
+});
+
+// Función para navegar a la página de detalles
+const navegarInicio = () => {
+  // Utiliza el método push de Vue Router para navegar a la página deseada
+  router.push("/");
+};
+//en proceso las paginas
+const paginasfaltantes = () => {
+  // Utiliza el método push de Vue Router para navegar a la página deseada
+  router.push("/proceso");
+};
+
+const esDispositivoMovil = computed(() => {
+  // Utiliza Quasar's $q.screen para detectar si es un dispositivo móvil
+  return $q.screen.width <= 600; // Puedes ajustar este valor según tus necesidades
+});
+
+const agregarAnuncio = async () => {
+  console.log("Agregando anuncio");
+  try {
+    const docRef = await addDoc(collection(db, "anuncios"), nuevoAnuncio.value);
+    console.log("Document written with ID: ", docRef.id);
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+};
+</script>
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header reveal elevated class="bg-primary text-white">
@@ -126,6 +204,7 @@
 
     <!--container principal-->
     <q-page-container>
+      <!-- {{ anuncios }} -->
       <router-view />
     </q-page-container>
     <q-footer>
@@ -164,7 +243,7 @@
         </q-bar>
 
         <q-card-section>
-          <div class="text-h6"><center>NUEVO ANUNCIO</center></div>
+          <div class="text-h6">NUEVO ANUNCIO</div>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
@@ -198,26 +277,26 @@
                 />
               </q-carousel>
               <br />
-              <center>
-                <q-btn
-                  round
-                  color="green"
-                  icon="add_circle_outline"
-                  class="lt-md"
-                />
-              </center>
+
+              <q-btn
+                round
+                color="green"
+                icon="add_circle_outline"
+                class="lt-md"
+              />
+
               <br />
               <div class="q-gutter-sm lt-md">
                 <q-input v-model="titulo" label="Titulo" outlined dense />
-                <center>
-                  <q-input
-                    v-model="precio"
-                    label="Precio"
-                    outlined
-                    dense
-                    style="width: 120px"
-                  />
-                </center>
+
+                <q-input
+                  v-model="precio"
+                  label="Precio"
+                  outlined
+                  dense
+                  style="width: 120px"
+                />
+
                 <div class="row">
                   <div class="col">
                     <q-input
@@ -390,17 +469,15 @@
                 <legend>Imagenes</legend>
                 <div class="row">
                   <div class="col-2">
-                    <center>
-                      <q-btn
-                        round
-                        color="green"
-                        icon="add_circle_outline"
-                        v-model="nuevoAnuncio.imagenesURL"
-                      />
-                      <br />
-                      <br />
-                      <q-btn round color="green" icon="remove" />
-                    </center>
+                    <q-btn
+                      round
+                      color="green"
+                      icon="add_circle_outline"
+                      v-model="nuevoAnuncio.imagenesURL"
+                    />
+                    <br />
+                    <br />
+                    <q-btn round color="green" icon="remove" />
                   </div>
                   <div class="col-5">
                     <q-markup-table>
@@ -583,7 +660,7 @@
   </div>
 </template>
 
-<script>
+<!-- <script>
 import { defineComponent, ref, computed, onMounted } from "vue";
 import EssentialLink from "components/EssentialLink.vue";
 import TarjetasCell from "src/components/TarjetasCell.vue";
@@ -597,7 +674,7 @@ const group = ref([]);
 const nuevoAnuncio = ref({
   marcaTelefono: "",
   modelo: "",
-  pantalla: 0.0,
+  pantalla: 0.0
   sistema: "",
   rom: 0.0,
   ram: 0.0,
@@ -684,4 +761,4 @@ async function agregarAnuncio() {
 }
 
 function leerDatos() {}
-</script>
+</script> -->
