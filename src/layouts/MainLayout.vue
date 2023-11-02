@@ -247,7 +247,7 @@ const agregarAnuncio = async () => {
         </q-bar>
 
         <q-card-section>
-          <div class="text-h6">NUEVO ANUNCIO</div>
+          <div class="text-h6"><center>NUEVO ANUNCIO</center></div>
         </q-card-section>
 
         <q-card-section class="q-pt-none">

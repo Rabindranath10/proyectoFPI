@@ -1,4 +1,4 @@
-<script setup>
+<!-- <script setup>
 import EssentialLink from "components/EssentialLink.vue";
 import TarjetasCell from "src/components/TarjetasCell.vue";
 import { defineComponent, ref, computed, onMounted, onBeforeMount } from "vue";
@@ -8,33 +8,28 @@ import { useCollection } from "vuefire";
 import { useQuasar } from "quasar";
 
 const group = ref([]);
-const groupNuevo = ref([]);
 const valorInicial = 0.0;
 const valorFinal = 0.0;
 const nuevo = ref(false);
 const $q = useQuasar();
 const optionsUno = ref([
-  { label: "Samsung 15", value: "samsung" },
-  { label: "Huawei 10", value: "huawei" },
-  { label: "Nokia 56", value: "nokia" },
-  { label: "iPhone 4", value: "iphone" },
+  { label: "Samsung 15", value: "sam" },
+  { label: "Huawei 10", value: "hua" },
+  { label: "Nokia 56", value: "noki" },
+  { label: "iPhone 4", value: "phone" },
   { label: "Xiomi 4", value: "xioami" },
 ]);
-const optionsDos = ref([
-  { label: "Android 15", value: "Android" },
-  { label: "Windows 10", value: "Windows" },
-  { label: "Ios 56", value: "Ios" },
-]);
-const optionsTres = ref([
-  { label: "6.0", value: 6.0 },
-  { label: "5.5", value: 5.5 },
-  { label: "5", value: 5 },
-]);
-const estados = ref([
-  { label: "Nuevo", value: "nuevo" },
-  { label: "Usado", value: "usado" },
-]);
-const estadotelefonos = ref(false);
+const optionsDos = [
+  { label: "Android 15", value: "an" },
+  { label: "Windows 10", value: "win" },
+  { label: "Ios 56", value: "ios" },
+];
+const optionsTres = [
+  { label: "6.0", value: "seis" },
+  { label: "5.5", value: "cincoPunto" },
+  { label: "5", value: "cinco" },
+];
+
 const anuncios = useCollection(collection(db, "anuncios"));
 const anunciosFiltrados = ref([]);
 const drawer = ref(true);
@@ -61,7 +56,7 @@ onMounted(async () => {
   console.log("onMounted");
   setTimeout(() => {
     anunciosFiltrados.value = [...anuncios.value];
-    //setMarcaFilters();
+    setMarcaFilters();
   }, 1000);
 });
 
@@ -81,7 +76,7 @@ const onItemClick = (option) => {
 const obtenerAnuncios = async () => {
   return [...anuncios.value];
 };
-//codigo de filtros por marca
+
 const filtrarPorMarca = async () => {
   // console.log(obtenerAnuncios());
   const filtros = group.value;
@@ -99,60 +94,9 @@ const filtrarPorMarca = async () => {
     return filtros.includes(anuncio.marcaTelefono);
   });
 };
-const filtrarPorSistema = async () => {
-  // console.log(obtenerAnuncios());
-  const filtros = group.value;
+</script>-->
 
-  console.log(filtros.length);
-
-  if (filtros.length == 0) {
-    anunciosFiltrados.value = await obtenerAnuncios();
-    return;
-  }
-
-  const anunciosC = await obtenerAnuncios();
-
-  anunciosFiltrados.value = anunciosC.filter((anuncio) => {
-    return filtros.includes(anuncio.sistema);
-  });
-};
-const filtrarPorPantalla = async () => {
-  // console.log(obtenerAnuncios());
-  const filtros = group.value;
-
-  console.log(filtros.length);
-
-  if (filtros.length == 0) {
-    anunciosFiltrados.value = await obtenerAnuncios();
-    return;
-  }
-
-  const anunciosC = await obtenerAnuncios();
-
-  anunciosFiltrados.value = anunciosC.filter((anuncio) => {
-    return filtros.includes(anuncio.pantalla);
-  });
-};
-const filtrarPorNuevo = async () => {
-  // console.log(obtenerAnuncios());
-  const filtros = groupNuevo.value;
-
-  console.log(filtros.length);
-
-  if (filtros.length == 0) {
-    anunciosFiltrados.value = await obtenerAnuncios();
-    return;
-  }
-
-  const anunciosC = await obtenerAnuncios();
-
-  anunciosFiltrados.value = anunciosC.filter((anuncio) => {
-    return filtros.includes(anuncio.estado);
-  });
-};
-</script>
-
-<!-- <script>
+<script>
 import EssentialLink from "components/EssentialLink.vue";
 import TarjetasCell from "src/components/TarjetasCell.vue";
 
@@ -163,31 +107,93 @@ import { db } from "boot/firebase";
 import { useCollection } from "vuefire";
 
 const group = ref([]);
-const valorInicial = 0.0;
-const valorFinal = 0.0;
+const selectedBrands = ref([]);
+const selectedSystems = ref([]);
+const selectedScreens = ref([]);
+const valorInicial = ref();
+const valorFinal = ref();
 const nuevo = ref(false);
 const optionsUno = [
-  { label: "Samsung 15", value: "sam" },
-  { label: "Huawei 10", value: "hua" },
-  { label: "Nokia 56", value: "noki" },
-  { label: "iPhone 4", value: "phone" },
-  { label: "Xiomi 4", value: "xiomi" },
+  { label: "Samsung 15", value: "samsung" },
+  { label: "Huawei 10", value: "huawei" },
+  { label: "Nokia 56", value: "nokia" },
+  { label: "iPhone 4", value: "iphone" },
+  { label: "Xiaomi 4", value: "xiaomi" },
 ];
 const optionsDos = [
-  { label: "Android 15", value: "an" },
-  { label: "Windows 10", value: "win" },
-  { label: "Ios 56", value: "ios" },
+  { label: "Android 15", value: "Android" },
+  { label: "Windows", value: "Windows" },
+  { label: "Ios 56", value: "Ios" },
 ];
 const optionsTres = [
-  { label: "6.0", value: "seis" },
-  { label: "5.5", value: "cincoPunto" },
-  { label: "5", value: "cinco" },
+  { label: "6.0", value: "6.0" },
+  { label: "5.5", value: "5.5" },
+  { label: "5.0", value: "5.0" },
 ];
 
 export default {
   setup() {
-    const anuncios = ref(null);
+    const anuncios = ref([]);
 
+    onMounted(async () => {
+      const querySnapshot = await getDocs(collection(db, "anuncios"));
+      anuncios.value = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+    });
+
+    // Filtros
+    const anunciosFiltrados = computed(() => {
+      let filteredAnuncios = anuncios.value;
+
+      if (selectedBrands.value.length > 0) {
+        // Filtro por marca
+        filteredAnuncios = filteredAnuncios.filter((anuncio) =>
+          selectedBrands.value.some(
+            (selectedBrand) =>
+              anuncio.marcaTelefono.toLowerCase().trim() ===
+              selectedBrand.toLowerCase().trim()
+          )
+        );
+        //console.log("Marca filtrados:", filteredAnuncios);
+      }
+      if (selectedSystems.value.length > 0) {
+        // Filtro por sistema operativo
+        filteredAnuncios = filteredAnuncios.filter((anuncio) =>
+          selectedSystems.value.some(
+            (selectedSystem) =>
+              anuncio.sistema.toLowerCase().trim() ===
+              selectedSystem.toLowerCase().trim()
+          )
+        );
+      }
+
+      if (selectedScreens.value.length > 0) {
+        // Filtro por tamaño de pantalla
+        filteredAnuncios = filteredAnuncios.filter((anuncio) => {
+          return selectedScreens.value.some((selectedScreen) => {
+            const formatNumber = (num) => {
+              if (typeof num === "string") {
+                return num.replace(/\.0+$/, "");
+              }
+              return num;
+            };
+            return (
+              formatNumber(anuncio.pantalla) === formatNumber(selectedScreen)
+            );
+          });
+        });
+      }
+      //Si el dispositivo es nuevo
+      if (nuevo.value) {
+        filteredAnuncios = filteredAnuncios.filter(
+          (anuncio) => anuncio.estado.toLowerCase() === "nuevo"
+        );
+      }
+
+      return filteredAnuncios;
+    });
     return {
       drawer: ref(true),
       group,
@@ -202,6 +208,10 @@ export default {
       valorInicial,
       valorFinal,
       anuncios,
+      anunciosFiltrados,
+      selectedBrands,
+      selectedSystems,
+      selectedScreens,
     };
   },
   computed: {
@@ -230,18 +240,13 @@ export default {
     };
   },
   components: { TarjetasCell },
-}; -->
-<!-- </script> -->
+};
+</script>
 <template>
   <div class="row">
     <div class="col-2">
       <div class="q-pa-md gt-sm">
-        <q-toggle
-          v-model="estadotelefonos"
-          @update:modelValue="filtrarPorNuevo"
-          checked-icon="check"
-          ><strong>Nuevo</strong></q-toggle
-        >
+        <q-toggle v-model="nuevo"><strong>Nuevo</strong></q-toggle>
         <br />
         <fieldset
           style="
@@ -250,12 +255,10 @@ export default {
           "
         >
           <legend>Marca:</legend>
-
           <q-option-group
             :options="optionsUno"
             type="checkbox"
-            v-model="group"
-            @update:modelValue="filtrarPorMarca"
+            v-model="selectedBrands"
           />
         </fieldset>
 
@@ -269,10 +272,10 @@ export default {
           <q-option-group
             :options="optionsDos"
             type="checkbox"
-            v-model="group"
-            @update:modelValue="filtrarPorSistema"
+            v-model="selectedSystems"
           />
         </fieldset>
+
         <fieldset
           style="
             border: 2px solid #000000;
@@ -283,8 +286,7 @@ export default {
           <q-option-group
             :options="optionsTres"
             type="checkbox"
-            v-model="group"
-            @update:modelValue="filtrarPorPantalla"
+            v-model="selectedScreens"
           />
         </fieldset>
       </div>
@@ -362,7 +364,7 @@ export default {
           <div class="q-pa-lg flex flex-center">
             <q-pagination v-model="current" :max="8" direction-links />
           </div>
-          Articulos por pagina:
+          <center class="gt-sm">Articulos por pagina:</center>
           <q-select
             transition-show="scale"
             transition-hide="scale"
@@ -401,8 +403,7 @@ export default {
       <q-option-group
         :options="optionsUno"
         type="checkbox"
-        v-model="group"
-        @update:modelValue="filtrarPorMarca"
+        v-model="selectedBrands"
       />
     </fieldset>
 
@@ -416,8 +417,7 @@ export default {
       <q-option-group
         :options="optionsDos"
         type="checkbox"
-        v-model="group"
-        @update:modelValue="filtrarPorSistema"
+        v-model="selectedSystems"
       />
     </fieldset>
     <fieldset
@@ -430,8 +430,7 @@ export default {
       <q-option-group
         :options="optionsTres"
         type="checkbox"
-        v-model="group"
-        @update:modelValue="filtrarPorPantalla"
+        v-model="selectedScreens"
       />
     </fieldset>
   </q-drawer>

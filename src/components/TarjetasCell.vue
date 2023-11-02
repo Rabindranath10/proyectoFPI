@@ -8,12 +8,16 @@
 
         <q-card-section>
           <div class="text-overline text-green-9">
-            {{ dato.marcaTelefono }}
+            <center>{{ dato.marcaTelefono }}</center>
           </div>
 
-          <div class="text-h6 q-mt-xs q-mb-xs">{{ dato.precio }}</div>
+          <div class="text-h6 q-mt-xs q-mb-xs">
+            <center>$ {{ dato.precio }}</center>
+          </div>
 
-          <div class="text-caption text-grey">{{ dato.descripcion }}</div>
+          <div class="text-caption text-grey">
+            <center>{{ dato.descripcion }}</center>
+          </div>
         </q-card-section>
 
         <q-card-actions>
