@@ -36,6 +36,7 @@ const uploadedFiles = ref([]);
 const customFileList = [];
 
 const nuevoAnuncio = ref({
+  estado: "",
   marcaTelefono: "",
   modelo: "",
   pantalla: 0.0,
@@ -49,6 +50,8 @@ const nuevoAnuncio = ref({
   descripcion: "",
   precio: 0.0,
 });
+
+const persistent = ref(false);
 
 // Función para navegar a la página de detalles
 const navegarInicio = () => {
@@ -71,6 +74,7 @@ const agregarAnuncio = async () => {
   try {
     const docRef = await addDoc(collection(db, "anuncios"), nuevoAnuncio.value);
     console.log("Document written with ID: ", docRef.id);
+    window.location.reload();
   } catch (e) {
     console.error("Error adding document: ", e);
   }
@@ -278,24 +282,28 @@ const agregarAnuncio = async () => {
               </q-carousel>
               <br />
 
-              <q-btn
-                round
-                color="green"
-                icon="add_circle_outline"
-                class="lt-md"
-              />
+              <center>
+                <q-btn
+                  round
+                  color="green"
+                  icon="add_circle_outline"
+                  class="lt-md"
+                />
+              </center>
+              <p></p>
 
               <br />
               <div class="q-gutter-sm lt-md">
                 <q-input v-model="titulo" label="Titulo" outlined dense />
-
-                <q-input
-                  v-model="precio"
-                  label="Precio"
-                  outlined
-                  dense
-                  style="width: 120px"
-                />
+                <center>
+                  <q-input
+                    v-model="precio"
+                    label="Precio"
+                    outlined
+                    dense
+                    style="width: 120px"
+                  />
+                </center>
 
                 <div class="row">
                   <div class="col">
@@ -627,12 +635,47 @@ const agregarAnuncio = async () => {
                 />
                 <q-btn
                   label="Crear"
-                  @click="agregarAnuncio"
+                  @click="persistent = true"
                   icon="save_as"
                   color="green"
                 />
+                <q-dialog
+                  v-model="persistent"
+                  persistent
+                  transition-show="scale"
+                  transition-hide="scale"
+                >
+                  <q-card class="bg-teal text-white" style="width: 400px">
+                    <q-card-section>
+                      <div class="text-h6">
+                        <center>
+                          <q-icon name="done" size="6rem" />
+                        </center>
+                      </div>
+                    </q-card-section>
+
+                    <q-card-section class="q-pt-none" align="center">
+                      <h4>¡Guardado!</h4>
+                      <p>Datos guardados con exito</p>
+                    </q-card-section>
+
+                    <q-card-actions align="center" class="bg-white text-teal">
+                      <center>
+                        <q-btn
+                          flat
+                          label="Listo"
+                          v-close-popup
+                          @click="agregarAnuncio"
+                        >
+                        </q-btn>
+                      </center>
+                    </q-card-actions>
+                  </q-card>
+                </q-dialog>
               </q-card-actions>
             </div>
+
+            <!-- codigo de la version movil -->
             <div class="col-md-6 col-12 lt-md">
               <fieldset style="border: 2px solid #000000">
                 <q-input

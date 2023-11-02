@@ -8,28 +8,33 @@ import { useCollection } from "vuefire";
 import { useQuasar } from "quasar";
 
 const group = ref([]);
+const groupNuevo = ref([]);
 const valorInicial = 0.0;
 const valorFinal = 0.0;
 const nuevo = ref(false);
 const $q = useQuasar();
 const optionsUno = ref([
-  { label: "Samsung 15", value: "sam" },
-  { label: "Huawei 10", value: "hua" },
-  { label: "Nokia 56", value: "noki" },
-  { label: "iPhone 4", value: "phone" },
+  { label: "Samsung 15", value: "samsung" },
+  { label: "Huawei 10", value: "huawei" },
+  { label: "Nokia 56", value: "nokia" },
+  { label: "iPhone 4", value: "iphone" },
   { label: "Xiomi 4", value: "xioami" },
 ]);
-const optionsDos = [
-  { label: "Android 15", value: "an" },
-  { label: "Windows 10", value: "win" },
-  { label: "Ios 56", value: "ios" },
-];
-const optionsTres = [
-  { label: "6.0", value: "seis" },
-  { label: "5.5", value: "cincoPunto" },
-  { label: "5", value: "cinco" },
-];
-
+const optionsDos = ref([
+  { label: "Android 15", value: "Android" },
+  { label: "Windows 10", value: "Windows" },
+  { label: "Ios 56", value: "Ios" },
+]);
+const optionsTres = ref([
+  { label: "6.0", value: 6.0 },
+  { label: "5.5", value: 5.5 },
+  { label: "5", value: 5 },
+]);
+const estados = ref([
+  { label: "Nuevo", value: "nuevo" },
+  { label: "Usado", value: "usado" },
+]);
+const estadotelefonos = ref(false);
 const anuncios = useCollection(collection(db, "anuncios"));
 const anunciosFiltrados = ref([]);
 const drawer = ref(true);
@@ -56,7 +61,7 @@ onMounted(async () => {
   console.log("onMounted");
   setTimeout(() => {
     anunciosFiltrados.value = [...anuncios.value];
-    setMarcaFilters();
+    //setMarcaFilters();
   }, 1000);
 });
 
@@ -76,7 +81,7 @@ const onItemClick = (option) => {
 const obtenerAnuncios = async () => {
   return [...anuncios.value];
 };
-
+//codigo de filtros por marca
 const filtrarPorMarca = async () => {
   // console.log(obtenerAnuncios());
   const filtros = group.value;
@@ -92,6 +97,57 @@ const filtrarPorMarca = async () => {
 
   anunciosFiltrados.value = anunciosC.filter((anuncio) => {
     return filtros.includes(anuncio.marcaTelefono);
+  });
+};
+const filtrarPorSistema = async () => {
+  // console.log(obtenerAnuncios());
+  const filtros = group.value;
+
+  console.log(filtros.length);
+
+  if (filtros.length == 0) {
+    anunciosFiltrados.value = await obtenerAnuncios();
+    return;
+  }
+
+  const anunciosC = await obtenerAnuncios();
+
+  anunciosFiltrados.value = anunciosC.filter((anuncio) => {
+    return filtros.includes(anuncio.sistema);
+  });
+};
+const filtrarPorPantalla = async () => {
+  // console.log(obtenerAnuncios());
+  const filtros = group.value;
+
+  console.log(filtros.length);
+
+  if (filtros.length == 0) {
+    anunciosFiltrados.value = await obtenerAnuncios();
+    return;
+  }
+
+  const anunciosC = await obtenerAnuncios();
+
+  anunciosFiltrados.value = anunciosC.filter((anuncio) => {
+    return filtros.includes(anuncio.pantalla);
+  });
+};
+const filtrarPorNuevo = async () => {
+  // console.log(obtenerAnuncios());
+  const filtros = groupNuevo.value;
+
+  console.log(filtros.length);
+
+  if (filtros.length == 0) {
+    anunciosFiltrados.value = await obtenerAnuncios();
+    return;
+  }
+
+  const anunciosC = await obtenerAnuncios();
+
+  anunciosFiltrados.value = anunciosC.filter((anuncio) => {
+    return filtros.includes(anuncio.estado);
   });
 };
 </script>
@@ -180,7 +236,12 @@ export default {
   <div class="row">
     <div class="col-2">
       <div class="q-pa-md gt-sm">
-        <q-toggle v-model="nuevo"><strong>Nuevo</strong></q-toggle>
+        <q-toggle
+          v-model="estadotelefonos"
+          @update:modelValue="filtrarPorNuevo"
+          checked-icon="check"
+          ><strong>Nuevo</strong></q-toggle
+        >
         <br />
         <fieldset
           style="
@@ -189,7 +250,7 @@ export default {
           "
         >
           <legend>Marca:</legend>
-          {{ group }}
+
           <q-option-group
             :options="optionsUno"
             type="checkbox"
@@ -209,6 +270,7 @@ export default {
             :options="optionsDos"
             type="checkbox"
             v-model="group"
+            @update:modelValue="filtrarPorSistema"
           />
         </fieldset>
         <fieldset
@@ -222,6 +284,7 @@ export default {
             :options="optionsTres"
             type="checkbox"
             v-model="group"
+            @update:modelValue="filtrarPorPantalla"
           />
         </fieldset>
       </div>
@@ -335,7 +398,12 @@ export default {
       "
     >
       <legend>Marca:</legend>
-      <q-option-group :options="optionsUno" type="checkbox" v-model="group" />
+      <q-option-group
+        :options="optionsUno"
+        type="checkbox"
+        v-model="group"
+        @update:modelValue="filtrarPorMarca"
+      />
     </fieldset>
 
     <fieldset
@@ -345,7 +413,12 @@ export default {
       "
     >
       <legend>Sistema:</legend>
-      <q-option-group :options="optionsDos" type="checkbox" v-model="group" />
+      <q-option-group
+        :options="optionsDos"
+        type="checkbox"
+        v-model="group"
+        @update:modelValue="filtrarPorSistema"
+      />
     </fieldset>
     <fieldset
       style="
@@ -354,7 +427,12 @@ export default {
       "
     >
       <legend>Pantalla:</legend>
-      <q-option-group :options="optionsTres" type="checkbox" v-model="group" />
+      <q-option-group
+        :options="optionsTres"
+        type="checkbox"
+        v-model="group"
+        @update:modelValue="filtrarPorPantalla"
+      />
     </fieldset>
   </q-drawer>
   <router-view />
