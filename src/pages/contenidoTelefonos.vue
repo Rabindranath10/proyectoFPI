@@ -35,7 +35,7 @@
       </div>
       <div class="col-12 col-md-6" style="padding-top: 20px">
         <h4 class="text-primary q-mb-sm">Informacion del telefono:</h4>
-        <h4 class="text-primary q-mb-sm">Precio:</h4>
+        <h4 class="text-primary q-mb-sm">Precio: ${{ dataTel.precio }}</h4>
         <q-btn
           label="Comprar"
           color="brown"
@@ -45,10 +45,10 @@
         <fieldset style="border: 2px solid #000000; padding: 15px">
           <div class="row">
             <div class="col">
-              <h6 class="text-weight-bold">Vendedor:</h6>
+              <h6 class="text-weight-bold">Vendedor: {{ dataTel.vendedor }}</h6>
             </div>
             <div class="col">
-              <h6 class="text-weight-bold">Teléfono:</h6>
+              <h6 class="text-weight-bold">Teléfono:{{ dataTel.telefono }}</h6>
             </div>
           </div>
         </fieldset>
@@ -67,7 +67,9 @@
             <q-item-section avatar>
               <q-icon name="error_outline" />
             </q-item-section>
-            <q-item-section><strong>Estado:</strong></q-item-section>
+            <q-item-section
+              ><strong>Estado: {{ dataTel.estado }}</strong></q-item-section
+            >
           </q-item>
           <q-item clickable v-ripple>
             <q-item-section avatar>
@@ -144,18 +146,30 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "boot/firebase";
+import { LocalStorage } from "quasar";
+let datos = {};
 
 export default {
   setup() {
     const router = useRouter();
     const navegarInicio = () => {
-      // Utiliza el método push de Vue Router para navegar a la página deseada
       router.push("/");
     };
 
+    onMounted(async () => {
+      console.clear();
+      const datoString = LocalStorage.getItem("anuncio");
+      if (datoString) {
+        datos = JSON.parse(datoString);
+      }
+    });
+
     return {
+      dataTel: datos,
       slide: ref(1),
       navegarInicio,
     };
