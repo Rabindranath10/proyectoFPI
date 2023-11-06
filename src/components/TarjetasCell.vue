@@ -1,10 +1,10 @@
 <template>
   <div class="row contenedores">
-    {{ anuncios }}
+    <p class="lt-md">{{ anuncios }}</p>
     <!--tarjeta 1-->
     <div class="col-6 col-md-3" v-for="(dato, i) in anuncios" :key="i">
       <q-card class="my-card-small q-mx-xs" flat bordered>
-        <q-img :src="dato.imagen" />
+        <q-img :src="dato.imagenesURL" />
 
         <q-card-section>
           <div class="text-overline text-green-9">

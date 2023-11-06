@@ -7,6 +7,7 @@ import { collection, addDoc, getDocs, query } from "firebase/firestore";
 import { db } from "boot/firebase";
 import { useCollection } from "vuefire";
 import { useQuasar } from "quasar";
+import { data } from "autoprefixer";
 
 const $q = useQuasar();
 const router = useRouter();
@@ -43,7 +44,7 @@ const nuevoAnuncio = ref({
   sistema: "",
   rom: 0.0,
   ram: 0.0,
-  imagenesURL: "",
+  imagenesURL: [],
   titulo: "",
   vendedor: "",
   telefono: 0.0,
@@ -52,6 +53,29 @@ const nuevoAnuncio = ref({
 });
 
 const persistent = ref(false);
+const agregarImagen = () => {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+
+  input.addEventListener("change", (event) => {
+    const files = event.target.files;
+
+    if (files.length > 0) {
+      const file = files[0];
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        nuevoAnuncio.value.imagenesURL.push(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+  input.click(); // Abre el campo de entrada de archivo
+};
+const quitarImagen = (index) => {
+  nuevoAnuncio.value.imagenesURL.splice(index, 1);
+};
 
 // Función para navegar a la página de detalles
 const navegarInicio = () => {
@@ -247,7 +271,7 @@ const agregarAnuncio = async () => {
         </q-bar>
 
         <q-card-section>
-          <div class="text-h6"><center>NUEVO ANUNCIO</center></div>
+          <center><div class="text-h6">NUEVO ANUNCIO</div></center>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
@@ -255,75 +279,76 @@ const agregarAnuncio = async () => {
             <div class="col-md-6 col-12">
               <!--codigo para telefono en dispositivo android-->
               <q-carousel
-                swipeable
                 animated
                 v-model="slide"
-                thumbnails
+                navigation
                 infinite
-                class="lt-md"
-                style="height: 200px"
+                :autoplay="autoplay"
+                arrows
+                transition-prev="slide-right"
+                transition-next="slide-left"
+                @mouseenter="autoplay = false"
+                @mouseleave="autoplay = true"
+                style="width: 90%; height: 240px"
+                class="q-mx-md lt-md"
               >
                 <q-carousel-slide
-                  :name="1"
-                  img-src="https://cdn.quasar.dev/img/mountains.jpg"
-                />
-                <q-carousel-slide
-                  :name="2"
-                  img-src="https://cdn.quasar.dev/img/parallax1.jpg"
-                />
-                <q-carousel-slide
-                  :name="3"
-                  img-src="https://cdn.quasar.dev/img/parallax2.jpg"
-                />
-                <q-carousel-slide
-                  :name="4"
-                  img-src="https://cdn.quasar.dev/img/quasar.jpg"
+                  v-for="(imagenes, index) in nuevoAnuncio.imagenesURL"
+                  :key="index"
+                  :name="index"
+                  :img-src="imagenes"
                 />
               </q-carousel>
               <br />
-
+              <!--//boton para agregar-->
               <center>
                 <q-btn
                   round
                   color="green"
                   icon="add_circle_outline"
                   class="lt-md"
+                  @click="agregarImagen"
                 />
               </center>
               <p></p>
-
               <br />
-              <div class="q-gutter-sm lt-md">
-                <q-input v-model="titulo" label="Titulo" outlined dense />
-                <center>
+              <center>
+                <div class="q-gutter-sm lt-md">
                   <q-input
-                    v-model="precio"
+                    v-model="nuevoAnuncio.titulo"
+                    label="Titulo"
+                    outlined
+                    dense
+                  />
+
+                  <q-input
+                    v-model="nuevoAnuncio.precio"
                     label="Precio"
                     outlined
                     dense
                     style="width: 120px"
                   />
-                </center>
 
-                <div class="row">
-                  <div class="col">
-                    <q-input
-                      v-model="vendedor"
-                      label="Vendedor"
-                      outlined
-                      dense
-                    />
-                  </div>
-                  <div class="col">
-                    <q-input
-                      v-model="telefono"
-                      label="Telefono"
-                      outlined
-                      dense
-                    />
+                  <div class="row">
+                    <div class="col">
+                      <q-input
+                        v-model="nuevoAnuncio.vendedor"
+                        label="Vendedor"
+                        outlined
+                        dense
+                      />
+                    </div>
+                    <div class="col">
+                      <q-input
+                        v-model="nuevoAnuncio.telefono"
+                        label="Telefono"
+                        outlined
+                        dense
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              </center>
               <br />
               <!-- Primera columna -->
               <fieldset style="border: 2px solid #000000">
@@ -481,11 +506,16 @@ const agregarAnuncio = async () => {
                       round
                       color="green"
                       icon="add_circle_outline"
-                      v-model="nuevoAnuncio.imagenesURL"
+                      @click="agregarImagen"
                     />
                     <br />
                     <br />
-                    <q-btn round color="green" icon="remove" />
+                    <q-btn
+                      round
+                      color="green"
+                      icon="remove"
+                      @click="quitarImagen"
+                    />
                   </div>
                   <div class="col-5">
                     <q-markup-table>
@@ -536,20 +566,10 @@ const agregarAnuncio = async () => {
                       class="q-mx-md"
                     >
                       <q-carousel-slide
-                        :name="1"
-                        img-src="https://cdn.quasar.dev/img/mountains.jpg"
-                      />
-                      <q-carousel-slide
-                        :name="2"
-                        img-src="https://cdn.quasar.dev/img/parallax1.jpg"
-                      />
-                      <q-carousel-slide
-                        :name="3"
-                        img-src="https://cdn.quasar.dev/img/parallax2.jpg"
-                      />
-                      <q-carousel-slide
-                        :name="4"
-                        img-src="https://cdn.quasar.dev/img/quasar.jpg"
+                        v-for="(imagenes, index) in nuevoAnuncio.imagenesURL"
+                        :key="index"
+                        :name="index"
+                        :img-src="imagenes"
                       />
                     </q-carousel>
                   </div>
@@ -674,12 +694,10 @@ const agregarAnuncio = async () => {
                 </q-dialog>
               </q-card-actions>
             </div>
-
-            <!-- codigo de la version movil -->
             <div class="col-md-6 col-12 lt-md">
               <fieldset style="border: 2px solid #000000">
                 <q-input
-                  v-model="descripcion"
+                  v-model="nuevoAnuncio.descripcion"
                   label="Descripcion"
                   outlined
                   dense
@@ -693,7 +711,45 @@ const agregarAnuncio = async () => {
                   icon="highlight_off"
                   color="green"
                 />
-                <q-btn label="Crear" icon="save_as" color="green" />
+                <q-btn
+                  label="Crear"
+                  icon="save_as"
+                  color="green"
+                  @click="persistent = true"
+                />
+                <q-dialog
+                  v-model="persistent"
+                  persistent
+                  transition-show="scale"
+                  transition-hide="scale"
+                >
+                  <q-card class="bg-teal text-white" style="width: 400px">
+                    <q-card-section>
+                      <div class="text-h6">
+                        <center>
+                          <q-icon name="done" size="6rem" />
+                        </center>
+                      </div>
+                    </q-card-section>
+
+                    <q-card-section class="q-pt-none" align="center">
+                      <h4>¡Guardado!</h4>
+                      <p>Datos guardados con exito</p>
+                    </q-card-section>
+
+                    <q-card-actions align="center" class="bg-white text-teal">
+                      <center>
+                        <q-btn
+                          flat
+                          label="Listo"
+                          v-close-popup
+                          @click="agregarAnuncio"
+                        >
+                        </q-btn>
+                      </center>
+                    </q-card-actions>
+                  </q-card> </q-dialog
+                >>
               </q-card-actions>
             </div>
           </div>
@@ -702,7 +758,6 @@ const agregarAnuncio = async () => {
     </q-dialog>
   </div>
 </template>
-
 <!-- <script>
 import { defineComponent, ref, computed, onMounted } from "vue";
 import EssentialLink from "components/EssentialLink.vue";

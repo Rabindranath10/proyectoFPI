@@ -110,14 +110,18 @@ const group = ref([]);
 const selectedBrands = ref([]);
 const selectedSystems = ref([]);
 const selectedScreens = ref([]);
+const ordenarPrecio = ref(false);
+const ordenarPorFecha = ref(false);
 const valorInicial = ref();
 const valorFinal = ref();
 const nuevo = ref(false);
+const paginacion = ref();
+
 const optionsUno = [
   { label: "Samsung 15", value: "samsung" },
   { label: "Huawei 10", value: "huawei" },
   { label: "Nokia 56", value: "nokia" },
-  { label: "iPhone 4", value: "iphone" },
+  { label: "iPhone 4", value: "phone" },
   { label: "Xiaomi 4", value: "xiaomi" },
 ];
 const optionsDos = [
@@ -144,6 +148,7 @@ export default {
     });
 
     // Filtros
+
     const anunciosFiltrados = computed(() => {
       let filteredAnuncios = anuncios.value;
 
@@ -192,8 +197,33 @@ export default {
         );
       }
 
+      // Para los precios inicial y final
+      if (valorInicial.value && valorFinal.value) {
+        filteredAnuncios = filteredAnuncios.filter((anuncio) => {
+          const precioAnuncio = parseFloat(anuncio.precio); // Convierte el precio del anuncio a número
+          return (
+            precioAnuncio >= parseFloat(valorInicial.value) &&
+            precioAnuncio <= parseFloat(valorFinal.value)
+          );
+        });
+      }
+      if (ordenarPrecio.value) {
+        filteredAnuncios.sort((a, b) => b.precio - a.precio);
+      }
+      if (ordenarPorFecha.value) {
+        filteredAnuncios.sort((a, b) => {
+          return new Date(b.fecha) - new Date(a.fecha);
+        });
+      }
+
       return filteredAnuncios;
     });
+    const toggleOrdenarPorPrecio = () => {
+      ordenarPrecio.value = !ordenarPrecio.value; // Cambia el valor de la bandera
+    };
+    const toggleOrdenarPorFecha = () => {
+      ordenarPorFecha.value = !ordenarPorFecha.value; // Cambia el valor de la bandera
+    };
     return {
       drawer: ref(true),
       group,
@@ -212,6 +242,8 @@ export default {
       selectedBrands,
       selectedSystems,
       selectedScreens,
+      toggleOrdenarPorPrecio,
+      toggleOrdenarPorFecha,
     };
   },
   computed: {
@@ -312,7 +344,11 @@ export default {
           </q-input>
         </div>
         <div class="6 q-mr-xs"><strong>Ordenar por:</strong></div>
-        <q-btn color="primary" class="q-mr-xs gt-sm">
+        <q-btn
+          color="primary"
+          class="q-mr-xs gt-sm"
+          @click="toggleOrdenarPorPrecio"
+        >
           <q-icon left size="2em" name="arrow_upward" />
           <div>Precio</div>
         </q-btn>
@@ -321,6 +357,7 @@ export default {
           class="q-mr-xs gt-sm"
           label="Fecha"
           icon="query_builder"
+          @click="toggleOrdenarPorFecha"
         >
         </q-btn>
         <!--boton que contiene las opciones de ordenar-->
@@ -333,7 +370,9 @@ export default {
             <q-list>
               <q-item clickable v-close-popup @click="onItemClick('Precio')">
                 <q-item-section>
-                  <q-item-label>Precio</q-item-label>
+                  <q-item-label @click="toggleOrdenarPorPrecio"
+                    >Precio</q-item-label
+                  >
                 </q-item-section>
               </q-item>
 
