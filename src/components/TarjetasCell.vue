@@ -57,7 +57,7 @@ export default {
       // Guarda el anuncio seleccionado en el localStorage
       localStorage.setItem("anuncio", JSON.stringify(data));
       // Utiliza el método push de Vue Router para navegar a la página deseada
-      router.push("/informacion");
+      router.push(`/informacion/${data.id}`);
     };
 
     return {

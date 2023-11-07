@@ -154,7 +154,7 @@
 
 <script>
 import { onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "boot/firebase";
 import { LocalStorage } from "quasar";
@@ -162,6 +162,7 @@ let datos = {};
 
 export default {
   setup() {
+    const route = useRoute();
     const router = useRouter();
     const navegarInicio = () => {
       router.push("/");
@@ -170,6 +171,7 @@ export default {
     onMounted(async () => {
       console.clear();
       const datoString = LocalStorage.getItem("anuncio");
+      console.log(route.params.id);
       if (datoString) {
         datos = JSON.parse(datoString);
       }

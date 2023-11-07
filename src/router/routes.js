@@ -12,7 +12,7 @@ const routes = [
     ],
   },
   {
-    path: "/informacion",
+    path: "/informacion/:id",
     component: () => import("layouts/MainLayout.vue"),
     children: [
       {
