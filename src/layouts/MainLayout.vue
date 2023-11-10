@@ -350,7 +350,7 @@ const agregarAnuncio = async () => {
                 </div>
               </center>
               <br />
-              <!-- Primera columna -->
+              <!-- Primera columna parte de computadora -->
               <fieldset style="border: 2px solid #000000">
                 <div class="q-gutter-sm">
                   <div style="justify-content: center; align-items: center">
@@ -578,7 +578,7 @@ const agregarAnuncio = async () => {
             </div>
 
             <div class="col-md-6 col-12 gt-sm">
-              <!-- Segunda columna -->
+              <!-- Segunda columna modo computadora-->
               <br /><br /><br /><br />
               <fieldset>
                 <div class="q-gutter-sm">
