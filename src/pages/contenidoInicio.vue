@@ -212,7 +212,7 @@ export default {
       }
       if (ordenarPorFecha.value) {
         filteredAnuncios.sort((a, b) => {
-          return new Date(b.fecha) - new Date(a.fecha);
+          return new Date(a.fecha) - new Date(b.fecha);
         });
       }
 

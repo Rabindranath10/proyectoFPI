@@ -87,6 +87,7 @@ const paginasfaltantes = () => {
   // Utiliza el método push de Vue Router para navegar a la página deseada
   router.push("/proceso");
 };
+//buscar palabras
 
 const esDispositivoMovil = computed(() => {
   // Utiliza Quasar's $q.screen para detectar si es un dispositivo móvil
@@ -131,6 +132,7 @@ const agregarAnuncio = async () => {
           v-model="text"
           label="Buscar"
           style="width: 430px; background-color: #fdffff"
+          @click="buscarPalabras"
         >
           <template v-slot:prepend>
             <q-icon name="search" />
@@ -502,12 +504,12 @@ const agregarAnuncio = async () => {
                 <legend>Imagenes</legend>
                 <div class="row">
                   <div class="col-2">
-                    <q-btn
-                      round
-                      color="green"
-                      icon="add_circle_outline"
-                      @click="agregarImagen"
-                    />
+                    <q-file v-model="files" filled multiple style="width: 40px">
+                      <q-icon
+                        name="add_circle_outline"
+                        style="height: 50px"
+                      ></q-icon>
+                    </q-file>
                     <br />
                     <br />
                     <q-btn
