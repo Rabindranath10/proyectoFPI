@@ -2,12 +2,18 @@
 import { defineComponent, ref, computed, onMounted } from "vue";
 import EssentialLink from "components/EssentialLink.vue";
 import TarjetasCell from "src/components/TarjetasCell.vue";
-import { useRouter } from "vue-router";
-import { collection, addDoc, getDocs, query } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, setDoc } from "firebase/firestore";
 import { db } from "boot/firebase";
 import { useCollection } from "vuefire";
 import { useQuasar } from "quasar";
 import { data } from "autoprefixer";
+import { useRouter } from "vue-router";
+import {
+  getStorage,
+  ref as ref2,
+  uploadBytes,
+  getDownloadURL,
+} from "@firebase/storage";
 
 const $q = useQuasar();
 const router = useRouter();
@@ -20,7 +26,7 @@ const pantallaRef = ref(null);
 const sistemaRef = ref(null);
 const romRef = ref(null);
 const ramRef = ref(null);
-const imagenesURL = ref(null);
+const imagenesURL = ref([]);
 const tituloRef = ref(null);
 const vendedorRef = ref(null);
 const telefonoRef = ref(null);
@@ -35,8 +41,12 @@ const options = ref(["Android", "Windows", "Ios"]);
 const opcionesSistema = ref(["Android", "Windows", "Ios"]);
 const uploadedFiles = ref([]);
 const customFileList = [];
+const fotos = ref(null);
+const fotosURL = ref([]);
+const idAnuncio = ref("");
 
 const nuevoAnuncio = ref({
+  id: "",
   estado: "",
   marcaTelefono: "",
   modelo: "",
@@ -53,6 +63,7 @@ const nuevoAnuncio = ref({
 });
 
 const persistent = ref(false);
+/*
 const agregarImagen = () => {
   const input = document.createElement("input");
   input.type = "file";
@@ -76,7 +87,55 @@ const agregarImagen = () => {
 const quitarImagen = (index) => {
   nuevoAnuncio.value.imagenesURL.splice(index, 1);
 };
+*/
 
+const subirImagenes = function () {
+  const storage = getStorage();
+  const promises = [];
+
+  fotos.value.forEach((foto) => {
+    const storageRef = ref2(storage, idAnuncio.value + "/" + foto.name);
+    //Se inicia con la subida de la imagen
+    const uploadTask = uploadBytes(storageRef, foto);
+
+    promises.push(
+      new Promise((resolve) => {
+        uploadTask
+          .then((snapshot) => {
+            //Se obtiene la URL de la imagen desde el storage para poder agregarla al documento (anuncio)
+            getDownloadURL(snapshot.ref).then((url) => {
+              imagenesURL.value.push(url);
+              console.log("Imagen subida: ", url);
+              resolve();
+            });
+          })
+          .catch((error) => {
+            console.error("Error al subir imagen: ", error);
+            resolve();
+          });
+      })
+    );
+  });
+
+  return Promise.all(promises);
+};
+
+function obtenerURL() {
+  if (fotos.value) {
+    fotos.value.forEach((element) => {
+      fotosURL.value.push(URL.createObjectURL(element));
+    });
+  }
+}
+
+function eliminarFotos() {
+  if (fotos.value) {
+    fotos.value.forEach((element) => {
+      fotosURL.value.pop();
+      fotos.value = null;
+    });
+  }
+}
 // Función para navegar a la página de detalles
 const navegarInicio = () => {
   // Utiliza el método push de Vue Router para navegar a la página deseada
@@ -95,13 +154,35 @@ const esDispositivoMovil = computed(() => {
 });
 
 const agregarAnuncio = async () => {
-  console.log("Agregando anuncio");
+  console.log("Agregando anuncio...");
   try {
     const docRef = await addDoc(collection(db, "anuncios"), nuevoAnuncio.value);
-    console.log("Document written with ID: ", docRef.id);
-    window.location.reload();
+    // Aqui se asigna el id para el manejo de imágenes
+    nuevoAnuncio.value.id = docRef.id;
+    idAnuncio.value = docRef.id;
+
+    // Subir imágenes y obtener URL
+    await subirImagenes();
+
+    // Agregar las URL de las imágenes a nuevoAnuncio.imagenesURL
+    nuevoAnuncio.value.imagenesURL = imagenesURL.value;
+
+    // Actualizar el documento con las URLs de las imágenes
+    await setDoc(docRef, nuevoAnuncio.value);
+
+    console.log("Documento escrito con ID: ", docRef.id);
+    $q.notify({
+      color: "green-5",
+      textColor: "white",
+      icon: "cloud_done",
+      message: "Anuncio creado satisfactoriamente",
+    });
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 3000);
   } catch (e) {
-    console.error("Error adding document: ", e);
+    console.error("Error al agregar el documento: ", e);
   }
 };
 </script>
@@ -295,22 +376,31 @@ const agregarAnuncio = async () => {
                 class="q-mx-md lt-md"
               >
                 <q-carousel-slide
-                  v-for="(imagenes, index) in nuevoAnuncio.imagenesURL"
-                  :key="index"
-                  :name="index"
-                  :img-src="imagenes"
+                  v-for="(img, id) in fotosURL"
+                  :key="id"
+                  :name="id + 1"
+                  :img-src="img"
                 />
               </q-carousel>
               <br />
               <!--//boton para agregar-->
               <center>
-                <q-btn
-                  round
-                  color="green"
-                  icon="add_circle_outline"
+                <q-file
+                  v-model="fotos"
                   class="lt-md"
-                  @click="agregarImagen"
-                />
+                  filled
+                  multiple
+                  style="width: 50px; height: 50px; overflow: hidden"
+                  accept=".jpg, image/*"
+                  @update:model-value="obtenerURL"
+                >
+                  <q-icon
+                    color="green"
+                    name="add_circle"
+                    style="font-size: 40px; margin: 5px -8px"
+                  >
+                  </q-icon>
+                </q-file>
               </center>
               <p></p>
               <br />
@@ -504,11 +594,20 @@ const agregarAnuncio = async () => {
                 <legend>Imagenes</legend>
                 <div class="row">
                   <div class="col-2">
-                    <q-file v-model="files" filled multiple style="width: 40px">
+                    <q-file
+                      v-model="fotos"
+                      filled
+                      multiple
+                      style="width: 40px; height: 50px; overflow: hidden"
+                      accept=".jpg, image/*"
+                      @update:model-value="obtenerURL"
+                    >
                       <q-icon
-                        name="add_circle_outline"
-                        style="height: 50px"
-                      ></q-icon>
+                        color="green"
+                        name="add_circle"
+                        style="font-size: 40px; margin: 5px -10px"
+                      >
+                      </q-icon>
                     </q-file>
                     <br />
                     <br />
@@ -516,7 +615,7 @@ const agregarAnuncio = async () => {
                       round
                       color="green"
                       icon="remove"
-                      @click="quitarImagen"
+                      @click.stop.prevent="eliminarFotos()"
                     />
                   </div>
                   <div class="col-5">
@@ -568,10 +667,10 @@ const agregarAnuncio = async () => {
                       class="q-mx-md"
                     >
                       <q-carousel-slide
-                        v-for="(imagenes, index) in nuevoAnuncio.imagenesURL"
-                        :key="index"
-                        :name="index"
-                        :img-src="imagenes"
+                        v-for="(img, id) in fotosURL"
+                        :key="id"
+                        :name="id + 1"
+                        :img-src="img"
                       />
                     </q-carousel>
                   </div>
