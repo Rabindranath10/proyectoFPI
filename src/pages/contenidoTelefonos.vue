@@ -155,32 +155,41 @@
 <script>
 import { onMounted, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, doc, getDoc } from "firebase/firestore";
 import { db } from "boot/firebase";
 import { LocalStorage } from "quasar";
-let datos = {};
 
 export default {
   setup() {
     const route = useRoute();
     const router = useRouter();
+    const dataTel = ref([]);
     const navegarInicio = () => {
       router.push("/");
     };
 
     onMounted(async () => {
       console.clear();
-      const datoString = LocalStorage.getItem("anuncio");
       console.log(route.params.id);
-      if (datoString) {
-        datos = JSON.parse(datoString);
+
+      try {
+        const anuncioId = route.params.id;
+        const anuncioRef = doc(collection(db, "anuncios"), anuncioId);
+        const anuncioSnapshot = await getDoc(anuncioRef);
+
+        if (anuncioSnapshot.exists()) {
+          dataTel.value = anuncioSnapshot.data();
+        } else {
+          //console.log("El anuncio no existe en Firestore o tiene campos vacios");
+        }
+      } catch (error) {
+        console.error("Error al obtener datos del anuncio:", error);
       }
     });
 
     return {
-      dataTel: datos,
+      dataTel,
       slide: ref(1),
-
       navegarInicio,
     };
   },
