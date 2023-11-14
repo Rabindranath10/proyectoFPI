@@ -115,6 +115,7 @@ const ordenarPorFecha = ref(false);
 const valorInicial = ref();
 const valorFinal = ref();
 const nuevo = ref(false);
+const usado = ref(false);
 const paginacion = ref();
 
 const optionsUno = [
@@ -196,6 +197,11 @@ export default {
           (anuncio) => anuncio.estado.toLowerCase() === "nuevo"
         );
       }
+      if (usado.value) {
+        filteredAnuncios = filteredAnuncios.filter(
+          (anuncio) => anuncio.estado.toLowerCase() === "usado"
+        );
+      }
 
       // Para los precios inicial y final
       if (valorInicial.value && valorFinal.value) {
@@ -235,6 +241,7 @@ export default {
       optionsTres,
       paginacion: ["4", "8", "12", "25"],
       nuevo,
+      usado,
       valorInicial,
       valorFinal,
       anuncios,
@@ -279,6 +286,7 @@ export default {
     <div class="col-2">
       <div class="q-pa-md gt-sm">
         <q-toggle v-model="nuevo"><strong>Nuevo</strong></q-toggle>
+        <q-toggle v-model="usado"><strong>Usado</strong></q-toggle>
         <br />
         <fieldset
           style="
