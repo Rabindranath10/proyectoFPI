@@ -1,10 +1,10 @@
 <template>
   <div class="row contenedores">
     <p class="lt-md">{{ anuncios }}</p>
-
+    <p class>{{ datosPaginados }}</p>
     <!--tarjeta 1-->
     <div class="col-6 col-md-3" v-for="(dato, i) in anuncios" :key="i">
-      <q-card class="my-card-small q-ma-xs" flat bordered>
+      <q-card class="my-card-small q-ma-xs" flat bordered style="height: 430px">
         <!--Para que se muestre solo la primera imagen del anuncio -->
         <q-img :src="dato.imagenesURL[0]" style="height: 220px" />
 
@@ -26,7 +26,7 @@
           <q-btn
             flat
             color="primary"
-            label="Ver"
+            label="Ver detalles"
             @click="navigateToDetailsPage(dato)"
           />
 
@@ -50,7 +50,7 @@
 import { useRouter } from "vue-router";
 
 export default {
-  props: ["anuncios"],
+  props: ["anuncios", "datosPaginados"],
   setup() {
     const router = useRouter();
 

@@ -23,6 +23,17 @@ const routes = [
     ],
   },
   {
+    path: "/estadisticas",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      {
+        path: "",
+
+        component: () => import("pages/estadisticaCelular.vue"),
+      },
+    ],
+  },
+  {
     path: "/proceso",
     component: () => import("pages/paginaProceso.vue"),
   },

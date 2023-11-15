@@ -19,6 +19,7 @@ const $q = useQuasar();
 const router = useRouter();
 
 const group = ref([]);
+//variables para validaciones
 const estadoRef = ref(null);
 const marcaRef = ref(null);
 const modeloRef = ref(null);
@@ -44,7 +45,7 @@ const customFileList = [];
 const fotos = ref(null);
 const fotosURL = ref([]);
 const idAnuncio = ref("");
-
+const inputRef = ref(null);
 const nuevoAnuncio = ref({
   id: "",
   estado: "",
@@ -63,6 +64,27 @@ const nuevoAnuncio = ref({
 });
 
 const persistent = ref(false);
+const validarFormulario = computed(() => {
+  if (
+    !nuevoAnuncio.value.estado ||
+    !nuevoAnuncio.value.marcaTelefono ||
+    !nuevoAnuncio.value.marcaTelefono ||
+    !nuevoAnuncio.value.modelo ||
+    !nuevoAnuncio.value.pantalla ||
+    !nuevoAnuncio.value.sistema ||
+    !nuevoAnuncio.value.rom ||
+    !nuevoAnuncio.value.ram ||
+    !nuevoAnuncio.value.imagenesURL ||
+    !nuevoAnuncio.value.titulo ||
+    !nuevoAnuncio.value.vendedor ||
+    !nuevoAnuncio.value.telefono ||
+    !nuevoAnuncio.value.descripcion ||
+    nuevoAnuncio.value.precio == 0
+  ) {
+    return false;
+  }
+  return true;
+});
 /*
 const agregarImagen = () => {
   const input = document.createElement("input");
@@ -145,6 +167,11 @@ const navegarInicio = () => {
 const paginasfaltantes = () => {
   // Utiliza el método push de Vue Router para navegar a la página deseada
   router.push("/proceso");
+};
+//funcion para ir a estadisticas
+const navegarEstadisticas = () => {
+  // Utiliza el método push de Vue Router para navegar a la página deseada
+  router.push("/estadisticas");
 };
 //buscar palabras
 
@@ -240,7 +267,7 @@ const agregarAnuncio = async () => {
             color="secondary"
             icon="leaderboard"
             label="Estadisticas"
-            @click="paginasfaltantes"
+            @click="navegarEstadisticas"
           />
           <q-btn
             color="secondary"
@@ -411,6 +438,8 @@ const agregarAnuncio = async () => {
                     label="Titulo"
                     outlined
                     dense
+                    :rules="[(val) => !!val || 'Este campo es requerido']"
+                    ref="tituloRef"
                   />
 
                   <q-input
@@ -418,7 +447,16 @@ const agregarAnuncio = async () => {
                     label="Precio"
                     outlined
                     dense
+                    type="number"
                     style="width: 120px"
+                    ref="precioRef"
+                    :rules="[
+                      (val) =>
+                        (val !== null && val !== '') ||
+                        'Este campo es obligatorio',
+                      (val) =>
+                        (val > 0 && val < 100) || 'Ingresa un numero real',
+                    ]"
                   />
 
                   <div class="row">
@@ -428,6 +466,8 @@ const agregarAnuncio = async () => {
                         label="Vendedor"
                         outlined
                         dense
+                        :rules="[(val) => !!val || 'Este campo es requerido']"
+                        ref="vendedorRef"
                       />
                     </div>
                     <div class="col">
@@ -436,6 +476,17 @@ const agregarAnuncio = async () => {
                         label="Telefono"
                         outlined
                         dense
+                        type="number"
+                        :rules="[
+                          (val) =>
+                            (val !== null && val !== '') ||
+                            'Este campo es obligatorio',
+                          (val) => val > 0 || 'Ingresa un numero real',
+                          (val) =>
+                            /^\d{8}$/.test(val) ||
+                            'Ingresa un número de 8 dígitos',
+                        ]"
+                        ref="telefonoRef"
                       />
                     </div>
                   </div>
@@ -452,12 +503,14 @@ const agregarAnuncio = async () => {
                       val="nuevo"
                       label="Nuevo"
                       outlined
+                      ref="estadoRef"
                       dense
                       class="q-mx-md"
                     />
                     <q-radio
                       v-model="nuevoAnuncio.estado"
                       val="usado"
+                      ref="estadoRef"
                       label="Usado"
                       outlined
                       dense
@@ -482,6 +535,8 @@ const agregarAnuncio = async () => {
                         v-model="nuevoAnuncio.marcaTelefono"
                         outlined
                         dense
+                        :rules="[(val) => !!val || 'Este campo es requerido']"
+                        ref="marcaRef"
                       />
                     </div>
                   </div>
@@ -497,7 +552,13 @@ const agregarAnuncio = async () => {
                       Modelo:
                     </div>
                     <div class="col-10 col-md-10">
-                      <q-input v-model="nuevoAnuncio.modelo" outlined dense />
+                      <q-input
+                        v-model="nuevoAnuncio.modelo"
+                        outlined
+                        dense
+                        :rules="[(val) => !!val || 'Este campo es requerido']"
+                        ref="modeloRef"
+                      />
                     </div>
                   </div>
                   <div class="row">
@@ -516,7 +577,16 @@ const agregarAnuncio = async () => {
                         v-model="nuevoAnuncio.pantalla"
                         outlined
                         dense
+                        ref="pantallaRef"
                         suffix="Pulgadas"
+                        type="number"
+                        :rules="[
+                          (val) =>
+                            (val !== null && val !== '') ||
+                            'Este campo es obligatorio',
+                          (val) =>
+                            (val > 0 && val < 100) || 'Ingresa un numero real',
+                        ]"
                       />
                     </div>
                   </div>
@@ -536,8 +606,10 @@ const agregarAnuncio = async () => {
                         transition-show="scale"
                         transition-hide="scale"
                         filled
+                        ref="sistemaRef"
                         v-model="nuevoAnuncio.sistema"
                         :options="opcionesSistema"
+                        :rules="[(val) => !!val || 'Este campo es requerido']"
                       />
                     </div>
                   </div>
@@ -553,7 +625,16 @@ const agregarAnuncio = async () => {
                         v-model="nuevoAnuncio.rom"
                         outlined
                         dense
+                        ref="romRef"
                         suffix="GB"
+                        type="number"
+                        :rules="[
+                          (val) =>
+                            (val !== null && val !== '') ||
+                            'Este campo es obligatorio',
+                          (val) =>
+                            (val > 0 && val < 100) || 'Ingresa un numero real',
+                        ]"
                       />
                     </div>
                     <div
@@ -583,7 +664,16 @@ const agregarAnuncio = async () => {
                         v-model="nuevoAnuncio.ram"
                         outlined
                         dense
+                        ref="ramRef"
                         suffix="GB"
+                        type="number"
+                        :rules="[
+                          (val) =>
+                            (val !== null && val !== '') ||
+                            'Este campo es obligatorio',
+                          (val) =>
+                            (val > 0 && val < 100) || 'Ingresa un numero real',
+                        ]"
                       />
                     </div>
                   </div>
@@ -686,7 +776,13 @@ const agregarAnuncio = async () => {
                   <div>
                     Titulo Breve del Anuncio
                     <p></p>
-                    <q-input v-model="nuevoAnuncio.titulo" outlined dense />
+                    <q-input
+                      v-model="nuevoAnuncio.titulo"
+                      outlined
+                      dense
+                      ref="tituloRef"
+                      :rules="[(val) => !!val || 'Este campo es requerido']"
+                    />
                   </div>
                   <div class="row">
                     <div
@@ -700,7 +796,13 @@ const agregarAnuncio = async () => {
                       Vendedor:
                     </div>
                     <div class="col-10">
-                      <q-input v-model="nuevoAnuncio.vendedor" outlined dense />
+                      <q-input
+                        v-model="nuevoAnuncio.vendedor"
+                        outlined
+                        dense
+                        ref="vendedorRef"
+                        :rules="[(val) => !!val || 'Este campo es requerido']"
+                      />
                     </div>
                   </div>
                   <div class="row">
@@ -715,7 +817,22 @@ const agregarAnuncio = async () => {
                       Teléfono:
                     </div>
                     <div class="col-10">
-                      <q-input v-model="nuevoAnuncio.telefono" outlined dense />
+                      <q-input
+                        v-model="nuevoAnuncio.telefono"
+                        outlined
+                        dense
+                        ref="telefonoRef"
+                        type="number"
+                        :rules="[
+                          (val) =>
+                            (val !== null && val !== '') ||
+                            'Este campo es obligatorio',
+                          (val) => val > 0 || 'Ingresa un numero real',
+                          (val) =>
+                            /^\d{8}$/.test(val) ||
+                            'Ingresa un número de 8 dígitos',
+                        ]"
+                      />
                     </div>
                   </div>
                   <div>
@@ -725,7 +842,13 @@ const agregarAnuncio = async () => {
                       v-model="nuevoAnuncio.descripcion"
                       outlined
                       dense
+                      ref="descripcionRef"
                       type="textarea"
+                      :rules="[
+                        (val) => !!val || 'Este campo es requerido',
+                        (val) =>
+                          val.length <= 50 || 'Ingrese solamente 50 caracteres',
+                      ]"
                     />
                   </div>
                   <fieldset
@@ -742,7 +865,16 @@ const agregarAnuncio = async () => {
                       suffix="$"
                       outlined
                       dense
+                      ref="precioRef"
                       style="width: 100%"
+                      type="number"
+                      :rules="[
+                        (val) =>
+                          (val !== null && val !== '') ||
+                          'Este campo es obligatorio',
+                        (val) =>
+                          (val > 0 && val < 100) || 'Ingresa un numero real',
+                      ]"
                     />
                   </fieldset>
                 </div>
@@ -756,6 +888,7 @@ const agregarAnuncio = async () => {
                 />
                 <q-btn
                   label="Crear"
+                  :disable="!validarFormulario"
                   @click="persistent = true"
                   icon="save_as"
                   color="green"
@@ -803,6 +936,12 @@ const agregarAnuncio = async () => {
                   outlined
                   dense
                   type="textarea"
+                  :rules="[
+                    (val) => !!val || 'Este campo es requerido',
+                    (val) =>
+                      val.length <= 50 || 'Ingrese solamente 50 caracteres',
+                  ]"
+                  ref="descripcionRef"
                 />
               </fieldset>
               <q-card-actions align="center" class="text-primary">
@@ -813,6 +952,7 @@ const agregarAnuncio = async () => {
                   color="green"
                 />
                 <q-btn
+                  :disable="!validarFormulario"
                   label="Crear"
                   icon="save_as"
                   color="green"
