@@ -454,8 +454,7 @@ const agregarAnuncio = async () => {
                       (val) =>
                         (val !== null && val !== '') ||
                         'Este campo es obligatorio',
-                      (val) =>
-                        (val > 0 && val < 100) || 'Ingresa un numero real',
+                      (val) => val > 0 || 'Ingresa un numero real',
                     ]"
                   />
 
@@ -872,8 +871,7 @@ const agregarAnuncio = async () => {
                         (val) =>
                           (val !== null && val !== '') ||
                           'Este campo es obligatorio',
-                        (val) =>
-                          (val > 0 && val < 100) || 'Ingresa un numero real',
+                        (val) => val > 0 || 'Ingresa un numero real',
                       ]"
                     />
                   </fieldset>
