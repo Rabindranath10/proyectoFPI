@@ -336,7 +336,7 @@ export default {
       <div class="row flex flex-center">
         <strong class="gt-sm">Precio:</strong>
         <div class="col-3 gt-sm">
-          <q-input v-model="valorInicial">
+          <q-input v-model="valorInicial" type="number">
             <template v-slot:prepend>
               <q-icon name="attach_money" />
             </template>
@@ -345,7 +345,7 @@ export default {
         <strong class="gt-sm">Hasta:</strong>
 
         <div class="col-3 gt-sm">
-          <q-input v-model="valorFinal">
+          <q-input v-model="valorFinal" type="number">
             <template v-slot:prepend>
               <q-icon name="attach_money" />
             </template>
@@ -439,6 +439,8 @@ export default {
     side="right"
   >
     <q-toggle v-model="nuevo"><strong>Nuevo</strong></q-toggle>
+    <br />
+    <q-toggle v-model="usado"><strong>Usado</strong></q-toggle>
     <br />
     <fieldset
       style="

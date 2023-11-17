@@ -330,7 +330,7 @@ const agregarAnuncio = async () => {
           <q-item-section><strong>Carrito</strong></q-item-section>
         </q-item>
 
-        <q-item clickable v-ripple @click="paginasfaltantes">
+        <q-item clickable v-ripple @click="navegarEstadisticas">
           <q-item-section avatar>
             <q-icon name="leaderboard" />
           </q-item-section>
@@ -631,8 +631,7 @@ const agregarAnuncio = async () => {
                           (val) =>
                             (val !== null && val !== '') ||
                             'Este campo es obligatorio',
-                          (val) =>
-                            (val > 0 && val < 100) || 'Ingresa un numero real',
+                          (val) => val > 0 || 'Ingresa un numero real',
                         ]"
                       />
                     </div>
@@ -670,8 +669,7 @@ const agregarAnuncio = async () => {
                           (val) =>
                             (val !== null && val !== '') ||
                             'Este campo es obligatorio',
-                          (val) =>
-                            (val > 0 && val < 100) || 'Ingresa un numero real',
+                          (val) => val > 0 || 'Ingresa un numero real',
                         ]"
                       />
                     </div>

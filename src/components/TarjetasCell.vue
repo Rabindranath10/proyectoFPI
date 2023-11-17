@@ -1,7 +1,7 @@
 <template>
   <div class="row contenedores">
-    <p class="lt-md">{{ anuncios }}</p>
-    <p class>{{ datosPaginados }}</p>
+    <p class="lt-md gt-sm">{{ anuncios }}</p>
+
     <!--tarjeta 1-->
     <div class="col-6 col-md-3" v-for="(dato, i) in anuncios" :key="i">
       <q-card class="my-card-small q-ma-xs" flat bordered style="height: 430px">
