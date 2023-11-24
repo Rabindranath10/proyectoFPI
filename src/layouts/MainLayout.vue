@@ -33,6 +33,7 @@ const vendedorRef = ref(null);
 const telefonoRef = ref(null);
 const descripcionRef = ref(null);
 const precioRef = ref(null);
+const fechaRef = ref(null);
 const dialog = ref(false);
 const maximizedToggle = ref(true);
 const slide = ref(1);
@@ -149,7 +150,24 @@ function obtenerURL() {
     });
   }
 }
-
+function limpiarCampos() {
+  nuevoAnuncio.value = {
+    id: "",
+    estado: "",
+    marcaTelefono: "",
+    modelo: "",
+    pantalla: 0.0,
+    sistema: "",
+    rom: 0.0,
+    ram: 0.0,
+    imagenesURL: [],
+    titulo: "",
+    vendedor: "",
+    telefono: 0.0,
+    descripcion: "",
+    precio: 0.0,
+  };
+}
 function eliminarFotos() {
   if (fotos.value) {
     fotos.value.forEach((element) => {
@@ -347,8 +365,14 @@ const agregarAnuncio = async () => {
     </q-page-container>
     <q-footer>
       <q-toolbar>
-        <q-toolbar-title>
-          <div></div>
+        <q-toolbar-title
+          class="text-center q-mb-sm items-center justify-center gt-sm"
+        >
+          <div class="row">
+            <div class="col">Kendall Cárcamo</div>
+            <div class="col">Italo Rabindranath Cárcamo</div>
+            <div class="col">Gabriela Hernández</div>
+          </div>
         </q-toolbar-title>
       </q-toolbar>
     </q-footer>
@@ -583,8 +607,7 @@ const agregarAnuncio = async () => {
                           (val) =>
                             (val !== null && val !== '') ||
                             'Este campo es obligatorio',
-                          (val) =>
-                            (val > 0 && val < 100) || 'Ingresa un numero real',
+                          (val) => val > 0 || 'Ingresa un numero real',
                         ]"
                       />
                     </div>
@@ -844,7 +867,8 @@ const agregarAnuncio = async () => {
                       :rules="[
                         (val) => !!val || 'Este campo es requerido',
                         (val) =>
-                          val.length <= 50 || 'Ingrese solamente 50 caracteres',
+                          val.length <= 100 ||
+                          'Ingrese solamente 100 caracteres',
                       ]"
                     />
                   </div>
@@ -881,6 +905,7 @@ const agregarAnuncio = async () => {
                   v-close-popup
                   icon="highlight_off"
                   color="green"
+                  @click="limpiarCampos"
                 />
                 <q-btn
                   label="Crear"
@@ -935,7 +960,7 @@ const agregarAnuncio = async () => {
                   :rules="[
                     (val) => !!val || 'Este campo es requerido',
                     (val) =>
-                      val.length <= 50 || 'Ingrese solamente 50 caracteres',
+                      val.length <= 100 || 'Ingrese solamente 100 caracteres',
                   ]"
                   ref="descripcionRef"
                 />
@@ -946,6 +971,7 @@ const agregarAnuncio = async () => {
                   v-close-popup
                   icon="highlight_off"
                   color="green"
+                  @click="limpiarCampos"
                 />
                 <q-btn
                   :disable="!validarFormulario"

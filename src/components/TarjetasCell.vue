@@ -4,9 +4,9 @@
 
     <!--tarjeta 1-->
     <div class="col-6 col-md-3" v-for="(dato, i) in anuncios" :key="i">
-      <q-card class="my-card-small q-ma-xs" flat bordered style="height: 430px">
+      <q-card class="my-card-small q-ma-xs" flat bordered style="height: 520px">
         <!--Para que se muestre solo la primera imagen del anuncio -->
-        <q-img :src="dato.imagenesURL[0]" style="height: 220px" />
+        <q-img :src="dato.imagenesURL[0]" style="height: 240px" />
 
         <q-card-section>
           <div class="text-overline text-green-9">
@@ -16,8 +16,17 @@
           <div class="text-h6 q-mt-xs q-mb-xs">
             <center>$ {{ dato.precio }}</center>
           </div>
-
-          <div class="text-caption text-grey">
+          <q-avatar
+            v-for="size in ['md', 'md', 'md', 'md', 'md']"
+            :key="size"
+            :size="size"
+            color="white"
+            text-color="blue"
+            icon="star"
+          />
+          (5.0)
+          <p></p>
+          <div class="text-caption text-grey" style="height: 50px">
             <center>{{ dato.descripcion }}</center>
           </div>
         </q-card-section>
@@ -50,7 +59,7 @@
 import { useRouter } from "vue-router";
 
 export default {
-  props: ["anuncios", "datosPaginados"],
+  props: ["anuncios"],
   setup() {
     const router = useRouter();
 

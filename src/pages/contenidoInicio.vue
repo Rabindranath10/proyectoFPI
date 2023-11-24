@@ -118,11 +118,16 @@ const nuevo = ref(false);
 const usado = ref(false);
 const paginacion = ref();
 
+const actual = ref(1);
+const elementosPorPagina = ref([4, 8, 12, 25]);
+const cuantosArticulos = ref(4);
+const datosPaginados = ref([]);
+
 const optionsUno = [
   { label: "Samsung 15", value: "samsung" },
   { label: "Huawei 10", value: "huawei" },
   { label: "Nokia 56", value: "nokia" },
-  { label: "iPhone 4", value: "phone" },
+  { label: "iPhone 4", value: "iPhone" },
   { label: "Xiaomi 4", value: "xiaomi" },
 ];
 const optionsDos = [
@@ -135,6 +140,9 @@ const optionsTres = [
   { label: "5.5", value: "5.5" },
   { label: "5.0", value: "5.0" },
 ];
+function recargarPagina() {
+  return window.location.reload();
+}
 
 export default {
   setup() {
@@ -142,6 +150,7 @@ export default {
 
     onMounted(async () => {
       const querySnapshot = await getDocs(collection(db, "anuncios"));
+
       anuncios.value = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -217,9 +226,7 @@ export default {
         filteredAnuncios.sort((a, b) => b.precio - a.precio);
       }
       if (ordenarPorFecha.value) {
-        filteredAnuncios.sort((a, b) => {
-          return new Date(a.fecha) - new Date(b.fecha);
-        });
+        filteredAnuncios.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
       }
 
       return filteredAnuncios;
@@ -230,6 +237,36 @@ export default {
     const toggleOrdenarPorFecha = () => {
       ordenarPorFecha.value = !ordenarPorFecha.value; // Cambia el valor de la bandera
     };
+    function paginas(cuantosArticulos) {
+      if (cuantosArticulos == elementosPorPagina.value[0]) {
+        return Math.ceil(anuncios.value.length / elementosPorPagina.value[0]);
+      } else if (cuantosArticulos == elementosPorPagina.value[1]) {
+        return Math.ceil(anuncios.value.length / elementosPorPagina.value[1]);
+      } else if (cuantosArticulos == elementosPorPagina.value[2]) {
+        return Math.ceil(anuncios.value.length / elementosPorPagina.value[2]);
+      }
+    }
+
+    function obtenerDataPagina(nPagina) {
+      datosPaginados.value = [];
+      let init;
+      let fin;
+      if (cuantosArticulos.value == elementosPorPagina.value[0]) {
+        init =
+          nPagina * elementosPorPagina.value[0] - elementosPorPagina.value[0];
+        fin = nPagina * elementosPorPagina.value[0];
+      } else if (cuantosArticulos.value == elementosPorPagina.value[1]) {
+        init =
+          nPagina * elementosPorPagina.value[1] - elementosPorPagina.value[1];
+        fin = nPagina * elementosPorPagina.value[1];
+      } else if (cuantosArticulos.value == elementosPorPagina.value[2]) {
+        init =
+          nPagina * elementosPorPagina.value[2] - elementosPorPagina.value[2];
+        fin = nPagina * elementosPorPagina.value[2];
+      }
+
+      datosPaginados.value = anunciosFiltrados.value.slice(init, fin);
+    }
     return {
       drawer: ref(true),
       group,
@@ -251,6 +288,13 @@ export default {
       selectedScreens,
       toggleOrdenarPorPrecio,
       toggleOrdenarPorFecha,
+      recargarPagina,
+      actual,
+      elementosPorPagina,
+      cuantosArticulos,
+      datosPaginados,
+      obtenerDataPagina,
+      paginas,
     };
   },
   computed: {
@@ -329,6 +373,15 @@ export default {
             v-model="selectedScreens"
           />
         </fieldset>
+        <br />
+        <q-btn
+          color="primary"
+          class="q-mr-xs gt-sm"
+          label="Limpiar filtros"
+          icon="cleaning_services"
+          @click="recargarPagina"
+        >
+        </q-btn>
       </div>
     </div>
 
@@ -356,18 +409,18 @@ export default {
           color="primary"
           class="q-mr-xs gt-sm"
           @click="toggleOrdenarPorPrecio"
+          label="Precio"
+          icon="arrow_upward"
         >
-          <q-icon left size="2em" name="arrow_upward" />
-          <div>Precio</div>
         </q-btn>
         <q-btn
           color="primary"
           class="q-mr-xs gt-sm"
           label="Fecha"
           icon="query_builder"
-          @click="toggleOrdenarPorFecha"
         >
         </q-btn>
+
         <!--boton que contiene las opciones de ordenar-->
         <div class="q-pa-md lt-md">
           <q-btn-dropdown
@@ -404,24 +457,31 @@ export default {
       <div class="col-12 col-md">
         <br />
         <!--aqui-->
-        <tarjetas-cell :anuncios="anunciosFiltrados"></tarjetas-cell>
+        <tarjetas-cell :anuncios="datosPaginados"></tarjetas-cell>
 
         <!--codigo de los numeros de abajo-->
-        <div class="q-pa-lg flex flex-center">
-          <div class="q-pa-lg flex flex-center">
-            <q-pagination v-model="current" :max="8" direction-links />
+        <div class="row">
+          <div class="col">
+            <q-pagination
+              v-model="actual"
+              @click="obtenerDataPagina(actual)"
+              :max="paginas(cuantosArticulos)"
+              direction-links
+              gutter="20px"
+              class="q-mt-md"
+            />
           </div>
-          <center class="gt-sm">Articulos por pagina:</center>
-          <q-select
-            transition-show="scale"
-            transition-hide="scale"
-            filled
-            v-model="seleccionarPagina"
-            :options="paginacion"
-            style="width: 8%"
-            @keyup.enter="prompt = false"
-            class="gt-sm"
-          />
+          <div class="col gt-sm">
+            <div class="q-pa-md row items-start q-gutter-md">
+              <label>Articulos por página</label>
+              <q-select
+                outlined
+                v-model="cuantosArticulos"
+                class="inputSmaller"
+                :options="elementosPorPagina"
+              ></q-select>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -442,6 +502,7 @@ export default {
     <br />
     <q-toggle v-model="usado"><strong>Usado</strong></q-toggle>
     <br />
+
     <fieldset
       style="
         border: 2px solid #000000;
@@ -482,6 +543,16 @@ export default {
         v-model="selectedScreens"
       />
     </fieldset>
+    <br />
+    <center>
+      <q-btn
+        color="primary"
+        label="Limpiar filtros"
+        icon="cleaning_services"
+        @click="recargarPagina"
+      >
+      </q-btn>
+    </center>
   </q-drawer>
   <router-view />
 </template>
