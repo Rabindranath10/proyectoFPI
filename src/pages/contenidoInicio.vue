@@ -100,7 +100,14 @@ const filtrarPorMarca = async () => {
 import EssentialLink from "components/EssentialLink.vue";
 import TarjetasCell from "src/components/TarjetasCell.vue";
 
-import { defineComponent, ref, computed, onMounted, onBeforeMount } from "vue";
+import {
+  defineComponent,
+  ref,
+  computed,
+  onMounted,
+  onBeforeMount,
+  watch,
+} from "vue";
 
 import { collection, addDoc, getDocs, query } from "firebase/firestore";
 import { db } from "boot/firebase";
@@ -231,6 +238,12 @@ export default {
 
       return filteredAnuncios;
     });
+
+    watch(
+      () => anunciosFiltrados.value,
+      () => obtenerDataPagina(1)
+    );
+
     const toggleOrdenarPorPrecio = () => {
       ordenarPrecio.value = !ordenarPrecio.value; // Cambia el valor de la bandera
     };
@@ -248,6 +261,8 @@ export default {
     }
 
     function obtenerDataPagina(nPagina) {
+      console.log(nPagina);
+
       datosPaginados.value = [];
       let init;
       let fin;
@@ -479,6 +494,7 @@ export default {
                 v-model="cuantosArticulos"
                 class="inputSmaller"
                 :options="elementosPorPagina"
+                @update:model-value="obtenerDataPagina(actual)"
               ></q-select>
             </div>
           </div>
