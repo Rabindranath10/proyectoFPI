@@ -126,7 +126,7 @@ const usado = ref(false);
 const paginacion = ref();
 
 const actual = ref(1);
-const elementosPorPagina = ref([4, 8, 12, 25]);
+const elementosPorPagina = ref([4, 8, 10, 25]);
 const cuantosArticulos = ref(4);
 const datosPaginados = ref([]);
 

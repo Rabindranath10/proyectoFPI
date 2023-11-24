@@ -150,23 +150,27 @@ function obtenerURL() {
     });
   }
 }
+function vaciar(index) {
+  fotosURL.value.splice(0, fotosURL.value.length);
+}
 function limpiarCampos() {
-  nuevoAnuncio.value = {
-    id: "",
-    estado: "",
-    marcaTelefono: "",
-    modelo: "",
-    pantalla: 0.0,
-    sistema: "",
-    rom: 0.0,
-    ram: 0.0,
-    imagenesURL: [],
-    titulo: "",
-    vendedor: "",
-    telefono: 0.0,
-    descripcion: "",
-    precio: 0.0,
-  };
+  vaciar(),
+    (nuevoAnuncio.value = {
+      id: "",
+      estado: "",
+      marcaTelefono: "",
+      modelo: "",
+      pantalla: 0.0,
+      sistema: "",
+      rom: 0.0,
+      ram: 0.0,
+      imagenesURL: [],
+      titulo: "",
+      vendedor: "",
+      telefono: 0.0,
+      descripcion: "",
+      precio: 0.0,
+    });
 }
 function eliminarFotos() {
   if (fotos.value) {
